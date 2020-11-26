@@ -2,8 +2,6 @@ import os
 import re
 from datetime import datetime
 
-mergedCommands = {}
-
 
 def getCommandResult(command):
     stream = os.popen(command)
@@ -26,60 +24,7 @@ tod commit
 Description $TEMPLATE$: asıjdaıjdsa
 $branch$: dev/init
 
-
-tod tempalte --create
-*
-*
-*
-*
------
-
 """
-
-
-class CommandTemplate:
-    def __init__(self, command, userInteractionNeeded):
-        # is this command have any gaps.
-        # when this command ran should I need some info from user.
-        self.command = command
-        self.isUserInteractionNeeded = userInteractionNeeded
-
-    def _updateCommandWithUserData(self):
-        placesToFill = re.findall("\$\w*\$", self.command)
-        for template in placesToFill:
-            result = input(template) # get the input
-            self.command.replace(template, result)
-
-    def executeCommand(self):
-        if self.isUserInteractionNeeded:
-            self._updateCommandWithUserData()
-
-        output = getCommandResult(self.command)
-        print(output)
-
-
-class MergedCommand:
-    def __init__(self, name):
-        self.commands = []
-        self.name = name
-
-    def add(self, command):
-        self.commands.append(command)
-
-    def isCommandNameExists(self, name):
-        return name in mergedCommands
-
-    def save(self):
-        if self.isCommandNameExists(self.name):
-            raise Exception(
-                "Command name is already exists, please use another name.")
-        mergedCommands[self.name] = self
-        # saveCommandToFile(self)
-
-    def run(self):
-        for command in self.commands:
-            result = getCommandResult(command)
-            print(result, end="")
 
 
 class Todo:
@@ -162,13 +107,5 @@ def getCurrentBranch():
 currentUser = getUserInformation()
 note1 = Todo(1, "My new note!")
 print(note1)
-
-command = MergedCommand("test")
-command.add("git branch")
-command.add("git config --global user.name")
-command.add("git config --global user.email")
-command.add("git branch -a")
-command.save()
-command.run()
 
 init()
