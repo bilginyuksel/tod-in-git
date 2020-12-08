@@ -1,43 +1,38 @@
 package util
 
-import (
-	"fmt"
-)
-
 // TrieNode ...
 type TrieNode struct {
 	isEnd    bool
-	children map[rune]TrieNode
+	children map[rune]*TrieNode
 	fuuid    string
 }
 
 /*
+BuildTrie ...
 Use this trie to understand given uuid is unique or not
 if the uuid is unique then get the actual uuid and use
 the asked todo or command.
 */
-func buildTrie(list []string) *TrieNode {
-	root := TrieNode{children: make(map[rune]TrieNode)}
+func BuildTrie(list []string) *TrieNode {
+	root := &TrieNode{children: make(map[rune]*TrieNode)}
 	node := root
 	for _, str := range list {
 		node = root
 		for _, char := range str {
 			if _, ok := node.children[char]; !ok {
-				node.children[char] = TrieNode{children: make(map[rune]TrieNode)}
+				node.children[char] = &TrieNode{children: make(map[rune]*TrieNode)}
 			}
 			node = node.children[char]
 		}
 		node.isEnd = true
 		node.fuuid = str
-		fmt.Println(node)
 	}
-	fmt.Println(root)
-	return &root
+	return root
 }
 
 // FindUUIDFromPrefix ...
-func FindUUIDFromPrefix(uid string) (bool, string) {
-	root := *buildTrie([]string{})
+func (trie *TrieNode) FindUUIDFromPrefix(uid string) (bool, string) {
+	root := BuildTrie([]string{})
 	for _, char := range uid {
 		if _, ok := root.children[char]; ok {
 			root = root.children[char]

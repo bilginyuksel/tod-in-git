@@ -7,38 +7,34 @@ import (
 
 func TestBuildTrie_Trie(t *testing.T) {
 	params := []string{"uui", "uii", "uim"}
-	given := buildTrie(params)
-	root := TrieNode{children: make(map[rune]TrieNode)}
-	root.children['u'] = TrieNode{children: make(map[rune]TrieNode)}
+	given := BuildTrie(params)
+	root := &TrieNode{children: make(map[rune]*TrieNode)}
+	root.children['u'] = &TrieNode{children: make(map[rune]*TrieNode)}
 	node := root.children['u']
-	node.children['u'] = TrieNode{children: make(map[rune]TrieNode)}
-	node.children['i'] = TrieNode{children: make(map[rune]TrieNode)}
+	node.children['u'] = &TrieNode{children: make(map[rune]*TrieNode)}
+	node.children['i'] = &TrieNode{children: make(map[rune]*TrieNode)}
 	fnode := node.children['u']
 	snode := node.children['i']
-	fnode.children['i'] = TrieNode{isEnd: true, fuuid: "uui", children: make(map[rune]TrieNode)}
-	snode.children['i'] = TrieNode{isEnd: true, fuuid: "uii", children: make(map[rune]TrieNode)}
-	snode.children['i'] = TrieNode{isEnd: true, fuuid: "uim", children: make(map[rune]TrieNode)}
-
-	if !isTriesSame(given, &root) {
+	fnode.children['i'] = &TrieNode{isEnd: true, fuuid: "uui", children: make(map[rune]*TrieNode)}
+	snode.children['i'] = &TrieNode{isEnd: true, fuuid: "uii", children: make(map[rune]*TrieNode)}
+	snode.children['m'] = &TrieNode{isEnd: true, fuuid: "uim", children: make(map[rune]*TrieNode)}
+	if !isTriesSame(given, root) {
 		t.Error()
 	}
 }
 
 func isTriesSame(given *TrieNode, expected *TrieNode) bool {
 	isRootsSame := isTrieNodesSame(given, expected)
-	node1 := *given
-	node2 := *expected
-	fmt.Println(node1)
+	fmt.Println(given)
 	fmt.Println(expected)
-	for key := range node2.children {
-		node1 = node1.children[key]
-		node2 = node2.children[key]
-		// fmt.Println(node1)
-		// if !isTrieNodesSame(&node1, &node2) {
-		// 	return false
-		// }
+	if !isRootsSame {
+		return false
 	}
-	return true && isRootsSame
+	result := true
+	for key := range expected.children {
+		result = result && isTriesSame(given.children[key], expected.children[key])
+	}
+	return isRootsSame && result
 }
 
 func isTrieNodesSame(node1 *TrieNode, node2 *TrieNode) bool {
