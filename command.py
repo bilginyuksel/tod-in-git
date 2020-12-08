@@ -9,6 +9,22 @@ GIT_BASH = 'start "" "%ProgramFiles%\Git\git-bash.exe" -c "echo 1 && echo 2 && /
 POWERSHELL = 'powershell.exe'
 CMD = 'cmd.exe'
 
+"""
+tod template --create
+press y for add command
+1. git add .
+2. git commit -m "[TicketNo:] AR000000
+[Description:] $TEMPLATE$
+[Binary Source:] NA"
+3. git push -u origin $branch$
+attend commit
+
+tod commit
+Description $TEMPLATE$: asıjdaıjdsa
+$branch$: dev/init
+
+"""
+
 def execCmd(command):
     p = subprocess.Popen([POWERSHELL, command], stdout=sys.stdout)
     p.communicate()
