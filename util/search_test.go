@@ -23,6 +23,71 @@ func TestBuildTrie_Trie(t *testing.T) {
 	}
 }
 
+func TestBuildTrie_Trie2(t *testing.T) {
+	params := []string{"ua", "be", "cu"}
+	given := BuildTrie(params)
+	root := &TrieNode{children: make(map[rune]*TrieNode)}
+	root.children['u'] = &TrieNode{children: make(map[rune]*TrieNode)}
+	root.children['b'] = &TrieNode{children: make(map[rune]*TrieNode)}
+	root.children['c'] = &TrieNode{children: make(map[rune]*TrieNode)}
+	fnode := root.children['u']
+	snode := root.children['b']
+	tnode := root.children['c']
+	fnode.children['a'] = &TrieNode{isEnd: true, fuuid: "ua", children: make(map[rune]*TrieNode)}
+	snode.children['e'] = &TrieNode{isEnd: true, fuuid: "be", children: make(map[rune]*TrieNode)}
+	tnode.children['u'] = &TrieNode{isEnd: true, fuuid: "cu", children: make(map[rune]*TrieNode)}
+	if !isTriesSame(given, root) {
+		t.Error()
+	}
+}
+
+func TestFindUUIDInsideTrie_FindUUID(t *testing.T) {
+	params := []string{"uui", "uii", "uim"}
+	trie := BuildTrie(params)
+	ok, given := trie.FindUUIDFromPrefix("uu")
+	if !ok {
+		t.Error()
+	}
+	if given != "uui" {
+		t.Error()
+	}
+}
+
+func TestFindUUIDInsideTrie_UUIDNotFound(t *testing.T) {
+	params := []string{"destroy", "destrol", "destool", "desotrol"}
+	trie := BuildTrie(params)
+	ok, _ := trie.FindUUIDFromPrefix("destro")
+	if ok {
+		t.Error()
+	}
+	ok, _ = trie.FindUUIDFromPrefix("dest")
+	if ok {
+		t.Error()
+	}
+}
+
+func TestFindUUIDInsideTrie_UUIDFound(t *testing.T) {
+	params := []string{"destroy", "destrol", "destool", "desotrol"}
+	trie := BuildTrie(params)
+	ok, given := trie.FindUUIDFromPrefix("deso")
+	if !ok || given != "desotrol" {
+		t.Error()
+	}
+}
+
+func TestFindUUIDInsideTrie_NotRelatedInput(t *testing.T) {
+	params := []string{"destroy", "destrol", "destool", "desotrol"}
+	trie := BuildTrie(params)
+	ok, _ := trie.FindUUIDFromPrefix("seto")
+	if ok {
+		t.Error()
+	}
+	ok, _ = trie.FindUUIDFromPrefix("destroyol")
+	if ok {
+		t.Error()
+	}
+}
+
 func isTriesSame(given *TrieNode, expected *TrieNode) bool {
 	isRootsSame := isTrieNodesSame(given, expected)
 	fmt.Println(given)

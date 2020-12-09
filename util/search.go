@@ -32,7 +32,7 @@ func BuildTrie(list []string) *TrieNode {
 
 // FindUUIDFromPrefix ...
 func (trie *TrieNode) FindUUIDFromPrefix(uid string) (bool, string) {
-	root := BuildTrie([]string{})
+	root := trie
 	for _, char := range uid {
 		if _, ok := root.children[char]; ok {
 			root = root.children[char]
