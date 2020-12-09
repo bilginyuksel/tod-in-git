@@ -1,8 +1,9 @@
-package executor
+package cmd
 
 import (
 	"fmt"
 	"regexp"
+	"runtime"
 	"time"
 
 	"github.com/google/uuid"
@@ -26,6 +27,7 @@ type ZipCmd struct {
 	updatedTime time.Time
 	isShared    bool
 	isEditable  bool
+	os          string
 }
 
 // Cmd ...
@@ -45,6 +47,7 @@ func NewZipCmd(abbrevation string, author string, editable bool, shared bool) *Z
 		author:      author,
 		createdTime: time.Now(),
 		updatedTime: time.Now(),
+		os:          runtime.GOOS,
 		isEditable:  editable,
 		isShared:    shared}
 }
@@ -63,6 +66,28 @@ func (zpCm *ZipCmd) AddCommand(command string) {
 // ListOrdered ...
 func (zpCm *ZipCmd) ListOrdered() []Cmd {
 	return zpCm.commands
+}
+
+// Run ...
+func (zpCm *ZipCmd) Run() []string {
+	commands := zpCm.ListOrdered()
+	// collect all live data
+	for _, value := range commands {
+		if value.HasLiveData() {
+			// ask live data from user.
+		}
+	}
+	output := []string{}
+	for _, value := range commands {
+		if zpCm.os == "windows" {
+			out, _ := RunPsl(value.command)
+			output = append(output, string(out))
+		} else {
+			out, _ := RunLx(value.command)
+			output = append(output, string(out))
+		}
+	}
+	return output
 }
 
 func newCmd(command string) Cmd {

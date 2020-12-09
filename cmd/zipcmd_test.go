@@ -1,6 +1,9 @@
-package executor
+package cmd
 
-import "testing"
+import (
+	"os/exec"
+	"testing"
+)
 
 func TestNewCommand_WithoutLiveData(t *testing.T) {
 	cmdString := "git branch -a"
@@ -74,6 +77,36 @@ func TestAddCommand_AddThreeCommandWithLiveData(t *testing.T) {
 	if !sameZipCmd(expected, given) {
 		t.Error()
 	}
+}
+
+func TestRunZippedCommand_RunWithoutLiveData(t *testing.T) {
+	zipped := NewZipCmd("test", "bilginyuksel", true, true)
+	fcmd := "git branch"
+	scmd := "git config --global user.name"
+	tcmd := "git config --global user.email"
+	zipped.AddCommand(fcmd)
+	zipped.AddCommand(scmd)
+	zipped.AddCommand(tcmd)
+	given := zipped.Run() // Print the output and return outputs
+	expected := []string{}
+	expected = append(expected, manualCommandRunner(fcmd))
+	expected = append(expected, manualCommandRunner(scmd))
+	expected = append(expected, manualCommandRunner(tcmd))
+	if len(expected) != len(given) {
+		t.Error()
+	}
+	for i := 0; i < len(expected); i++ {
+		t.Logf("given= %v, expected= %v", given[i], expected[i])
+		if expected[i] != given[i] {
+			t.Error()
+		}
+	}
+
+}
+
+func manualCommandRunner(command string) string {
+	out, _ := exec.Command("powershell", command).Output()
+	return string(out)
 }
 
 func sameCmd(expected Cmd, given Cmd) bool {
