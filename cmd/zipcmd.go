@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -13,8 +14,6 @@ const liveDataRegexp = "[$]\\w*[$]"
 
 func init() {
 	fmt.Println("Package initialized")
-	uid, _ := uuid.NewUUID()
-	fmt.Println(uid)
 }
 
 // ZipCmd ...
@@ -68,13 +67,21 @@ func (zpCm *ZipCmd) ListOrdered() []Cmd {
 	return zpCm.commands
 }
 
+func fillLiveDataOfCommand(cmd *Cmd) {
+	for _, vl := range cmd.datas {
+		// get input
+		var userInp string
+		fmt.Scanf(vl, userInp)
+		cmd.command = strings.ReplaceAll(cmd.command, vl, userInp)
+	}
+}
+
 // Run ...
 func (zpCm *ZipCmd) Run() []string {
 	commands := zpCm.ListOrdered()
-	// collect all live data
-	for _, value := range commands {
-		if value.HasLiveData() {
-			// ask live data from user.
+	for i := 0; i < len(commands); i++ {
+		if commands[i].HasLiveData() {
+			fillLiveDataOfCommand(&commands[i])
 		}
 	}
 	output := []string{}
@@ -89,6 +96,10 @@ func (zpCm *ZipCmd) Run() []string {
 	}
 	return output
 }
+
+// func (zpCm *ZipCmd) Save() {
+// 	ioutil.WriteFile("my_file", []byte(zpCm), 0755)
+// }
 
 func newCmd(command string) Cmd {
 	uid, _ := uuid.NewUUID()
