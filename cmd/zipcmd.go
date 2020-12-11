@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"runtime"
@@ -11,6 +12,8 @@ import (
 )
 
 const liveDataRegexp = "[$]\\w*[$]"
+
+var dtoArr dtoZipArr
 
 func init() {
 	fmt.Println("Package initialized")
@@ -27,6 +30,11 @@ type ZipCmd struct {
 	isShared    bool
 	isEditable  bool
 	os          string
+}
+
+// ZipCmdList ...
+type ZipCmdList struct {
+	ZippedCommands []ZipCmd
 }
 
 // Cmd ...
@@ -97,9 +105,51 @@ func (zpCm *ZipCmd) Run() []string {
 	return output
 }
 
-// func (zpCm *ZipCmd) Save() {
-// 	ioutil.WriteFile("my_file", []byte(zpCm), 0755)
-// }
+type dtoZipCmd struct {
+	UUID        string
+	Commands    []Cmd
+	Abbrevation string
+	Author      string
+	CreatedTime time.Time
+	UpdatedTime time.Time
+	IsShared    bool
+	IsEditable  bool
+	Os          string
+}
+
+type dtoZipArr struct {
+	DtoZips []dtoZipCmd
+}
+
+func fillDTOArray() {
+	// read files then fill dto array list.
+
+}
+
+// Save ...
+func (zpCm *ZipCmd) Save() {
+	cons := &dtoZipCmd{
+		UUID:        zpCm.uuid,
+		Commands:    zpCm.commands,
+		Abbrevation: zpCm.abbrevation,
+		Author:      zpCm.author,
+		CreatedTime: zpCm.createdTime,
+		UpdatedTime: zpCm.updatedTime,
+		IsShared:    zpCm.isShared,
+		IsEditable:  zpCm.isEditable,
+		Os:          zpCm.os,
+	}
+	// No better way to do it currently because of I don't want to mess with file operations
+	// I am using json encoding/decoding
+	// byteData, _ := json.Marshal(&cons)
+	// fillDTOArrayIfNot()
+	dtoArr.DtoZips = append(dtoArr.DtoZips, *cons)
+	if len(dtoArr.DtoZips) == 0 {
+		fillDTOArray()
+	}
+	byteData, _ := json.Marshal(&dtoArr)
+	fmt.Println(byteData)
+}
 
 func newCmd(command string) Cmd {
 	uid, _ := uuid.NewUUID()
